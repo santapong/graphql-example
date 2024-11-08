@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from graphene import Schema
-from schemas.ex_1_schema import schema  # Import the Graphene schema
+from schemas import schema  # Import the Graphene schema
 import json
 from starlette.responses import HTMLResponse
 
@@ -58,3 +58,7 @@ async def graphql_handler(data):
         return success, response
     except Exception as e:
         return False, {"errors": [str(e)]}
+    
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run('server:app', port=8001, reload=True)
