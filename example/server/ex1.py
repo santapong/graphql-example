@@ -1,95 +1,60 @@
-import os, sys
-sys.path.append('/'.join([os.getcwd(),'example']))
-
-# main.py
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse, HTMLResponse
-
-from schema import schema  # Import the schema defined earlier
-
-import graphene
-import uvicorn
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from graphene import Schema
+from schemas.ex_1_schema import schema  # Import the Graphene schema
+import json
+from starlette.responses import HTMLResponse
 
 app = FastAPI()
 
+# GraphQL endpoint
 @app.post("/graphql")
 async def graphql_endpoint(request: Request):
-    try:
-        # Parse the incoming JSON request
-        data = await request.json()
-        query = data.get("query")
-        variables = data.get("variables")
-        operation_name = data.get("operationName")
+    data = await request.json()
+    success, result = await graphql_handler(data)
+    status_code = 200 if success else 400
+    return JSONResponse(status_code=status_code, content=result)
 
-        if not query:
-            raise HTTPException(status_code=400, detail="No query found in the request.")
-
-        # Execute the GraphQL query
-        result = schema.execute(
-            query,
-            variable_values=variables,
-            operation_name=operation_name,
-        )
-
-        # Prepare the response
-        response = {}
-        if result.errors:
-            response["errors"] = [str(error) for error in result.errors]
-        if result.data:
-            response["data"] = result.data
-
-        return JSONResponse(response)
-
-    except Exception as e:
-        # Handle unexpected errors
-        raise HTTPException(status_code=500, detail=str(e))
-
-# Optional: Serve GraphiQL interface
-@app.get("/graphiql", response_class=HTMLResponse)
-async def graphiql():
+@app.get("/graphql")
+async def graphql_playground():
     html_content = """
     <!DOCTYPE html>
     <html>
       <head>
-        <meta charset="utf-8" />
-        <title>GraphiQL</title>
-        <link href="https://unpkg.com/graphiql/graphiql.min.css" rel="stylesheet" />
-        <script
-          crossorigin
-          src="https://unpkg.com/react/umd/react.production.min.js"
-        ></script>
-        <script
-          crossorigin
-          src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"
-        ></script>
-        <script
-          crossorigin
-          src="https://unpkg.com/graphiql/graphiql.min.js"
-        ></script>
+        <title>GraphQL Playground</title>
+        <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/graphql-playground-react@1.7.20/build/static/css/index.css"
+        />
+        <link rel="shortcut icon" href="https://cdn.jsdelivr.net/npm/graphql-playground-react@1.7.20/build/favicon.png" />
+        <script src="https://cdn.jsdelivr.net/npm/graphql-playground-react@1.7.20/build/static/js/middleware.js"></script>
       </head>
-      <body style="margin: 0; overflow: hidden;">
-        <div id="graphiql" style="height: 100vh;"></div>
+      <body>
+        <div id="root"></div>
         <script>
-          const graphQLFetcher = graphQLParams =>
-            fetch('/graphql', {
-              method: 'post',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(graphQLParams),
+          window.addEventListener('load', function() {
+            GraphQLPlayground.init(document.getElementById('root'), {
+              endpoint: '/graphql'
             })
-              .then(response => response.json())
-              .catch(() => response.json());
-
-          ReactDOM.render(
-            React.createElement(GraphiQL, { fetcher: graphQLFetcher }),
-            document.getElementById('graphiql'),
-          );
+          })
         </script>
       </body>
     </html>
     """
-    return HTMLResponse(content=html_content)
+    return HTMLResponse(content=html_content, status_code=200)
 
-if __name__ == '__main__':
-    uvicorn.run('ex1:app',port=800, reload=True)
+async def graphql_handler(data):
+    try:
+        query = data.get("query")
+        variables = data.get("variables")
+        operation_name = data.get("operationName")
+        result = await schema.execute_async(query, variable_values=variables, operation_name=operation_name)
+        response = {}
+        if result.errors:
+            response["errors"] = [str(error) for error in result.errors]
+            success = False
+        if result.data:
+            response["data"] = result.data
+            success = True
+        return success, response
+    except Exception as e:
+        return False, {"errors": [str(e)]}

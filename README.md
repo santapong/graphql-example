@@ -6,4 +6,4 @@
 
 ## Run Locally
 ```python
-    uvicorn example_number:app -h localhost -p 8000
+uvicorn example_number:app -h localhost -p 8000
