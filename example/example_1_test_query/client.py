@@ -1,3 +1,5 @@
+# Example 1
+
 import requests
 
 url = 'http://localhost:8001/graphql'

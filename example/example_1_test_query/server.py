@@ -1,8 +1,8 @@
+# Example 1
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from graphene import Schema
 from schemas import schema  # Import the Graphene schema
-import json
 from starlette.responses import HTMLResponse
 
 app = FastAPI()
