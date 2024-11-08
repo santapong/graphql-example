@@ -9,6 +9,7 @@ dependencies = [
     "fastapi>=0.115.4",
     "graphene-sqlalchemy>=2.1.0",
     "graphene>=3.4.1",
+    "locust>=2.32.2",
     "psycopg2>=2.9.10",
     "pydantic>=2.9.2",
     "python-dotenv>=1.0.1",
