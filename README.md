@@ -16,7 +16,7 @@
 # using pip
 pip install -r requirement.txt
 
-@ using uv
+# using uv
 uv sync
 ```
 
