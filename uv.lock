@@ -28,6 +28,20 @@ wheels = [
 ]
 
 [[package]]
+name = "ariadne"
+version = "0.23.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "graphql-core" },
+    { name = "starlette" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4f/74/dc0232bc311a705c3cc642007bbbea817832c7fedb9655c870240804ad05/ariadne-0.23.0.tar.gz", hash = "sha256:84c46ae27fad98e1a6553c8930e6fc8e755f8dcd54a959d33caf04ecfe026a93", size = 75112 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/76/14/e2e13d6d2937f8fca9d220234f775e56119bce3cc3d6a807324faf5c80df/ariadne-0.23.0-py2.py3-none-any.whl", hash = "sha256:594206e4fc20fa05d6872f0ccd6e3aafe0575b9da36945211762445126b28bcb", size = 108265 },
+]
+
+[[package]]
 name = "blinker"
 version = "1.8.2"
 source = { registry = "https://pypi.org/simple" }
@@ -343,6 +357,7 @@ name = "graphql-example"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "ariadne" },
     { name = "eralchemy", extra = ["graphviz"] },
     { name = "fastapi" },
     { name = "graphene" },
@@ -357,6 +372,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "ariadne", specifier = ">=0.23.0" },
     { name = "eralchemy", extras = ["graphviz"], specifier = ">=1.5.0" },
     { name = "fastapi", specifier = ">=0.115.4" },
     { name = "graphene", specifier = ">=3.4.1" },
